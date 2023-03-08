@@ -2,6 +2,7 @@ import numpy as np
 from nnfs.datasets import spiral_data
 import nnfs
 
+from activation_relu import ReluActivation
 from denser_layer import DenseLayer
 
 nnfs.init()
@@ -18,7 +19,8 @@ x,y = spiral_data(samples=100,classes=3)
 dense1 = DenseLayer(2,3)
 dense1.forward(x)
 
-print(dense1.output[:5])
+activation = ReluActivation()
 
+activation.forward(dense1.output)
 
-
+print(activation.output[:5])
