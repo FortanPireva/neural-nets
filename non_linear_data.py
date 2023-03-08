@@ -4,6 +4,7 @@ import nnfs
 
 from activation_relu import ReluActivation
 from denser_layer import DenseLayer
+from softmax import SoftmaxActivation
 
 nnfs.init()
 
@@ -23,4 +24,13 @@ activation = ReluActivation()
 
 activation.forward(dense1.output)
 
-print(activation.output[:5])
+dense2 = DenseLayer(3,3)
+
+dense2.forward(activation.output)
+
+activation2 = SoftmaxActivation()
+
+activation2.forward(dense2.output)
+
+
+print(activation2.output[:5])
