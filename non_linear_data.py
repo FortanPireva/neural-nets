@@ -4,6 +4,7 @@ import nnfs
 
 from activation_relu import ReluActivation
 from denser_layer import DenseLayer
+from loss import CategoricalCrossEntropyLoss
 from softmax import SoftmaxActivation
 
 nnfs.init()
@@ -32,5 +33,14 @@ activation2 = SoftmaxActivation()
 
 activation2.forward(dense2.output)
 
+# create loss function
+loss_function = CategoricalCrossEntropyLoss()
+
 
 print(activation2.output[:5])
+
+# perform a forward pass through loss functino
+# it takes the output of second dense layer here and returns loss
+loss = loss_function.calculate(activation2.output,y)
+
+print('loss:', loss)
