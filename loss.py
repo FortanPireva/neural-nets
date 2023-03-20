@@ -19,6 +19,9 @@ class Loss:
 class CategoricalCrossEntropyLoss(Loss):
 
     # forward pass
+    def __init__(self):
+        self.dinputs = None
+
     def forward(self, y_pred, y_true):
 
         # number of samples in batch
@@ -40,3 +43,19 @@ class CategoricalCrossEntropyLoss(Loss):
         # losses
         negative_loss_likelihoods = -np.log(correct_confidences)
         return negative_loss_likelihoods
+    # backward pass
+    def backward(self, dvalues, y_true):
+        
+        samples = len(dvalues)
+        
+        labels = len(dvalues[0])
+        
+        if len(y_true.shape) == 1:
+            y_true = np.eye(labels)[y_true]
+        
+        # calculate gradient
+        self.dinputs = -y_true / dvalues
+        
+        # normalize gradient
+        self.dinputs = self.dinputs / samples
+        
