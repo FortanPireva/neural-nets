@@ -7,7 +7,9 @@ from activation_relu import ReluActivation
 from activation_softmax_loss_categorical_crossentropy import ActivationSoftmaxLossCategoricalCrossEntropy
 from denser_layer import DenseLayer
 from loss import CategoricalCrossEntropyLoss
+from optimization.RMSPropOptimizer import RMSPropOptimizer
 from optimization.adagradoptimizer import AdaGradOptimizer
+from optimization.adamoptimizer import AdamOptimizer
 from optimization.sgdoptimizer import SGDOptimizer
 from softmax import SoftmaxActivation
 
@@ -31,12 +33,13 @@ dense2 = DenseLayer(64, 3)
 loss_activation = ActivationSoftmaxLossCategoricalCrossEntropy()
 
 # create optimizer
-optimizer = AdaGradOptimizer(decay=1e-4) # 0.00
+optimizer = AdamOptimizer(learning_rate=0.03, decay=1e-5) # 0.00
 
 # train in loop
 for epoch in range(10001):
     # perform a forward pass of our training data through this layer
     dense1.forward(x)
+
 
     # perform a forward pass through activation function
     # takes the output of first dense layer here
