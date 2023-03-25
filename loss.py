@@ -35,6 +35,8 @@ class Loss:
             regularization_loss += layer.bias_regularizer_l2 * np.sum(layer.biases * layer.biases)
 
         return regularization_loss
+
+
 class CategoricalCrossEntropyLoss(Loss):
 
     # forward pass
@@ -75,6 +77,44 @@ class CategoricalCrossEntropyLoss(Loss):
 
         # calculate gradient
         self.dinputs = -y_true / dvalues
+
+        # normalize gradient
+        self.dinputs = self.dinputs / samples
+
+
+# binary cross-entropy loss
+class BinaryCrossEntropyLoss(Loss):
+
+    def __init__(self):
+        self.dinputs = None
+
+    # forward pass
+    def forward(self, y_pred, y_true):
+        # clip data to prevent division by zero
+        # clip both sides to not drag mean toward any value
+        y_pred_clipped = np.clip(y_pred, 1e-7, 1 - 1e-7)
+
+        # calculate sample-wise loss
+        sample_losses = - (y_true * np.log(y_pred_clipped) + (1 - y_true) * np.log(1 - y_pred_clipped))
+
+        sample_losses = np.mean(sample_losses, axis=-1)
+
+        # return sample_losses
+        return sample_losses
+
+    def backward(self, dvalues, y_true):
+        # number of samples
+        samples = len(dvalues)
+
+        # number of outputs in every sample
+        outputs = len(dvalues[0])
+
+        # clip data to prevent division by 0
+        # clip both sides so to not drag mean towards any value
+        clipped_dvalues = np.clip(dvalues, 1e-7, 1 - 1e-7)
+
+        # calculate gradient
+        self.dinputs = -(y_true / clipped_dvalues - (1 - y_true) / (1 - clipped_dvalues)) / outputs
 
         # normalize gradient
         self.dinputs = self.dinputs / samples
