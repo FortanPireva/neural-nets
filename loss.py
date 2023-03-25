@@ -147,3 +147,36 @@ class MeanSquaredErrorLoss(Loss):
         self.dinputs = dvalues * 2 * (y_true - dvalues) / outputs
         # normalize gradient
         self.dinputs = self.dinputs / samples
+
+
+
+class MeanAbsoluteError(Loss):
+
+    def __init__(self):
+        self.inputs = None
+        self.output = None
+        self.dinputs = None
+    #forward pass
+    def forward(self, y_pred, y_true):
+
+        # calculate loss
+        sample_loss = np.mean(np.abs(y_true - y_pred), axis=-1)
+
+        return sample_loss
+
+    def backward(self, dvalues, y_true):
+        # number of samples
+        samples = len(dvalues)
+
+        # number of outputs
+        outputs = len(samples[0])
+
+
+        # calculate gradients
+
+        self.dinputs = np.sign(y_true - dvalues) / outputs
+
+        # normalize gradients
+        self.dinputs = self.dinputs / samples
+
+
