@@ -32,3 +32,21 @@ class RegressionAccuracy(Accuracy):
     # compares prediction to the ground truth values
     def compare(self, predictions, y):
         return np.absolute(predictions - y) < self.precision
+
+
+# accuracy calculation for classification Model
+class CategoricalAccuracy(Accuracy):
+
+    # no initialization is needed
+    # still needs to exist as it will be called
+    # from train method inside the model class
+    def init(self, y):
+        pass
+
+    # compares predictions to the ground truth values
+    def compare(self, predictions, y):
+        if len(y.shape) == 2:
+            y = np.argmax(y, axis=1)
+        return predictions == y
+
+

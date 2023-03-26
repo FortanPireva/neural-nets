@@ -11,8 +11,12 @@ class DropoutLayer:
         self.dinputs = None
 
     # forward pass
-    def forward(self, inputs):
+    def forward(self, inputs, training):
         self.inputs = inputs
+
+        if not training:
+            self.output = inputs.copy()
+            return
 
         # generate binary mask
         self.binary_mask = np.random.binomial(1, self.success_rate, size=self.inputs.shape) / self.success_rate

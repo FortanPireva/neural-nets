@@ -35,7 +35,8 @@ class Model:
         self.accuracy = accuracy
 
     # train the model
-    def train(self, x, y, *, epochs=1, print_every=1):
+    def train(self, x, y, *, epochs=1, print_every=1,
+              validation_data = None):
 
         # initialize accuracy object
         self.accuracy.init(y)
@@ -43,10 +44,10 @@ class Model:
         # main training loop
         for epoch in range(1, epochs + 1):
             # perform the forward pass
-            output = self.forward(x)
+            output = self.forward(x, training=True)
 
             # calculate loss
-            data_loss, regularization_loss = self.loss.calculate(output, y)
+            data_loss, regularization_loss = self.loss.calculate(output, y, include_regularization=True)
             loss = data_loss + regularization_loss
 
             # get predictions and calculate accuracy
@@ -71,7 +72,25 @@ class Model:
                     f'data_loss: {data_loss:.3f}, ' +
                     f'reg_loss: {regularization_loss:.3f}), ' +
                     f'lr: {self.optimizer.current_learning_rate}')
+        if validation_data is not None:
 
+            x_test, y_test = validation_data
+
+            # perform forward pass
+            output = self.forward(x_test,training=False)
+
+            # calculate loss
+            loss = self.loss.calculate(output, y_test)
+
+            # get predictions anc calculate accuracy
+            predictions = self.output_layer_activation.predictions(output)
+            accuracy = self.accuracy.calculate(predictions, y_test)
+
+            # print summary
+            print(f'validation, ' +
+                  f'acc: {accuracy:.3f}' +
+                  f'loss: {loss:.3f}'
+                  )
     # finalize the model
     def finalize(self):
 
@@ -111,7 +130,7 @@ class Model:
         self.loss.remember_trainable_layers(self.trainable_layers)
 
     # forwrd pass
-    def forward(self, x):
+    def forward(self, x, training):
 
         # call forward method on input layer
         # this will set the output property that
@@ -121,7 +140,7 @@ class Model:
         # call forward method of every object in chain
         # pass output of the previous object as parameter
         for layer in self.layers:
-            layer.forward(layer.prev.output)
+            layer.forward(layer.prev.output, training)
 
         # layer is now the last object from the list
         # return its output
