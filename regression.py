@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import nnfs
 from nnfs.datasets import sine_data
 
-from activation_relu import ReluActivation
+from activations.activation_relu import ReluActivation
 from denser_layer import DenseLayer
 from loss import MeanSquaredErrorLoss
 from optimization.adamoptimizer import AdamOptimizer

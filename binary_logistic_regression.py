@@ -3,17 +3,11 @@ import numpy as np
 from matplotlib import pyplot as plt
 from nnfs.datasets import spiral_data
 
-from activation_relu import ReluActivation
-from activation_sigmoid import SigmoidActivation
-from activation_softmax_loss_categorical_crossentropy import ActivationSoftmaxLossCategoricalCrossEntropy
+from activations.activation_relu import ReluActivation
+from activations.activation_sigmoid import SigmoidActivation
 from denser_layer import DenseLayer
-from dropout.DropoutLayer import DropoutLayer
-from loss import CategoricalCrossEntropyLoss, BinaryCrossEntropyLoss
-from optimization.RMSPropOptimizer import RMSPropOptimizer
-from optimization.adagradoptimizer import AdaGradOptimizer
+from loss import BinaryCrossEntropyLoss
 from optimization.adamoptimizer import AdamOptimizer
-from optimization.sgdoptimizer import SGDOptimizer
-from softmax import SoftmaxActivation
 
 nnfs.init()
 
