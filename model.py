@@ -16,7 +16,7 @@ class Model:
         self.optimizer = None
 
         # trainable layers
-        self.trainable_layers = None
+        self.trainable_layers = []
 
         # output layer activation
         self.output_layer_activation = None
@@ -37,14 +37,40 @@ class Model:
     # train the model
     def train(self, x, y, *, epochs=1, print_every=1):
 
+        # initialize accuracy object
+        self.accuracy.init(y)
+
         # main training loop
         for epoch in range(1, epochs + 1):
             # perform the forward pass
             output = self.forward(x)
 
-            # temporary
-            print(output)
-            exit()
+            # calculate loss
+            data_loss, regularization_loss = self.loss.calculate(output, y)
+            loss = data_loss + regularization_loss
+
+            # get predictions and calculate accuracy
+            predictions = self.output_layer_activation.predictions(output)
+            accuracy = self.accuracy.calculate(predictions, y)
+
+            # do the backpropagation
+            self.backward(output, y)
+
+            # optimize weights and biases of trainable_layers
+            self.optimizer.pre_update_params()
+            for layer in self.trainable_layers:
+                self.optimizer.update_params(layer)
+
+            self.optimizer.post_update_params()
+
+            if not epoch % print_every:
+                print(
+                    f'epoch: {epoch}, ' +
+                    f'acc: {accuracy:.3f}, ' +
+                    f'loss: {loss:.3f} (' +
+                    f'data_loss: {data_loss:.3f}, ' +
+                    f'reg_loss: {regularization_loss:.3f}), ' +
+                    f'lr: {self.optimizer.current_learning_rate}')
 
     # finalize the model
     def finalize(self):
@@ -81,6 +107,8 @@ class Model:
             if hasattr(self.layers[i], "weights"):
                 self.trainable_layers.append(self.layers[i])
 
+        # update loss with trainable layers
+        self.loss.remember_trainable_layers(self.trainable_layers)
 
     # forwrd pass
     def forward(self, x):
@@ -98,3 +126,16 @@ class Model:
         # layer is now the last object from the list
         # return its output
         return layer.output
+
+    # backward pass of the model class
+    def backward(self, output, y):
+
+        # first call backward method on the loss
+        # that will set dinputs property on the last
+        # layer will try to access
+        self.loss.backward(output, y)
+
+        # call backward method going through all the objects
+        # in reversed order passing dinputs as a parameter
+        for layer in reversed(self.layers):
+            layer.backward(layer.next.dinputs)

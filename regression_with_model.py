@@ -1,3 +1,4 @@
+from accuracy import RegressionAccuracy
 from activations.activation_relu import ReluActivation
 from denser_layer import DenseLayer
 from loss import MeanSquaredErrorLoss
@@ -14,18 +15,19 @@ model = Model()
 
 
 # add layers
-model.add(DenseLayer(1,64))
+model.add(DenseLayer(1, 64))
 model.add(ReluActivation())
-model.add(DenseLayer(64,64))
+model.add(DenseLayer(64, 64))
 model.add(ReluActivation())
-model.add(DenseLayer(64,1))
+model.add(DenseLayer(64, 1))
 model.add(LinearActivation())
 
 # set loss function and optimizer
 
 model.set(
     loss=MeanSquaredErrorLoss(),
-    optimizer=AdamOptimizer()
+    optimizer=AdamOptimizer(learning_rate=0.005, decay=1e-3),
+    accuracy= RegressionAccuracy()
 )
 
 # finalize the model
