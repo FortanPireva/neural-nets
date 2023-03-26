@@ -16,12 +16,10 @@ class SoftmaxActivation:
         self.output = probabilities
 
     def backward(self, dvalues):
-
         # create uniinitialized array
         self.dinputs = np.empty_like(dvalues)
         # enumerate outputs and gradients
-        for index, (single_output, single_dvalues ) in enumerate(zip(self.output,dvalues)):
-
+        for index, (single_output, single_dvalues) in enumerate(zip(self.output, dvalues)):
             # flatten output array
             single_output = single_output.reshape(-1, 1)
             # calculate jacobian matrix of the output
@@ -29,4 +27,8 @@ class SoftmaxActivation:
 
             # calculate sample-wise gradient
             # and add it to the array of sample gradients
-            self.dinputs[index] = np.dot(jacobian_matrix,single_dvalues)
+            self.dinputs[index] = np.dot(jacobian_matrix, single_dvalues)
+
+        # calculate predictions for outputs
+        def predictions(self, outputs):
+            return np.argmax(outputs, axis=1)

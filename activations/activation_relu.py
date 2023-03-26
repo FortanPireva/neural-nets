@@ -20,3 +20,7 @@ class ReluActivation:
 
         # zero gradient where input values were negative
         self.dinputs[self.inputs <= 0] = 0
+
+    # calculate predictions
+    def predictions(self, outputs):
+            return outputs

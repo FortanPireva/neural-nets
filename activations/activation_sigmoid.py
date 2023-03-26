@@ -17,3 +17,7 @@ class SigmoidActivation:
     def backward(self, dvalues):
         # derivative - calculates output of the sigmoid function
         self.dinputs = dvalues * (1 - self.output) * self.output
+
+    # calculate predictions
+    def predictions(self, outputs):
+        return (outputs > 0.5) * 1  # convert to numbers from booleans

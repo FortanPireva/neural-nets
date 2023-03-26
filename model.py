@@ -18,14 +18,21 @@ class Model:
         # trainable layers
         self.trainable_layers = None
 
+        # output layer activation
+        self.output_layer_activation = None
+
+        # accuracy
+        self.accuracy = None
+
     # add objects to the model
     def add(self, layer):
         self.layers.append(layer)
 
     # use of * notes that the subsequent parameters are keyword arguments
-    def set(self, *, loss, optimizer):
+    def set(self, *, loss, optimizer, accuracy):
         self.loss = loss
         self.optimizer = optimizer
+        self.accuracy = accuracy
 
     # train the model
     def train(self, x, y, *, epochs=1, print_every=1):
@@ -63,6 +70,7 @@ class Model:
             else:
                 self.layers[i].prev = self.layers[i - 1]
                 self.layers[i].next = self.loss
+                self.output_layer_activation = self.layers[i]
 
             # if layer contains an attribute called "weights"
             # it's a trainable layer

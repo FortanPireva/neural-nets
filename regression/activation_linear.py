@@ -12,3 +12,7 @@ class LinearActivation:
     def backward(self, dvalues):
         # derivative is 1, 1 * dvalues = dvalues
         self.dinputs = dvalues.copy()
+
+    # calculate predictions
+    def predictions(self, outputs):
+        return outputs
