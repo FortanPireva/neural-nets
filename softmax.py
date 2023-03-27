@@ -6,7 +6,7 @@ class SoftmaxActivation:
         self.dinputs = None
         self.output = None
 
-    def forward(self, inputs):
+    def forward(self, inputs, training):
         # get normalized probabilities
         exp_values = np.exp(inputs - np.max(inputs, axis=1, keepdims=True))
 
@@ -30,5 +30,5 @@ class SoftmaxActivation:
             self.dinputs[index] = np.dot(jacobian_matrix, single_dvalues)
 
         # calculate predictions for outputs
-        def predictions(self, outputs):
-            return np.argmax(outputs, axis=1)
+    def predictions(self, outputs):
+        return np.argmax(outputs, axis=1)

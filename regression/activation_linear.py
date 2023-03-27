@@ -4,7 +4,7 @@ class LinearActivation:
         self.output = None
         self.dinputs = None
 
-    def forward(self, inputs):
+    def forward(self, inputs, training):
         # linear function f(x) = x
         self.inputs = inputs
         self.output = inputs

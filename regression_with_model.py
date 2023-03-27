@@ -1,6 +1,7 @@
 from accuracy import RegressionAccuracy
 from activations.activation_relu import ReluActivation
 from denser_layer import DenseLayer
+from dropout.DropoutLayer import DropoutLayer
 from loss import MeanSquaredErrorLoss
 from model import Model
 from optimization.adamoptimizer import AdamOptimizer

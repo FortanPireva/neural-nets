@@ -9,7 +9,7 @@ class ReluActivation:
         self.inputs = None
         self.output = None
 
-    def forward(self, inputs):
+    def forward(self, inputs, training):
         # remember input values
         self.inputs = inputs
         # calculate output values from input
