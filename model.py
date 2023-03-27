@@ -66,7 +66,7 @@ class Model:
 
                 validation_steps = len(x_val) // batch_size
 
-                if validation_steps * batch_size < len(x_val)
+                if validation_steps * batch_size < len(x_val):
                     validation_steps +=1
 
         # main training loop

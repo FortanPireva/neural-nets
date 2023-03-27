@@ -21,7 +21,7 @@ def load_mnist_dataset(dataset, path):
 
             # and append image as sample and label as y
             x.append(image)
-            x.append(label)
+            y.append(label)
 
     return np.array(x), np.array(y).astype('uint8')
 
