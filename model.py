@@ -41,34 +41,20 @@ class Model:
     # train the model
     def train(self, x, y, *, epochs=1, print_every=1,
               batch_size=None,
-              validation_data = None):
+              validation_data=None):
 
         # initialize accuracy object
         self.accuracy.init(y)
 
         # default value if batch size is not being set
         train_steps = 1
-        # if there is validation data passed,
-        # set default number of steps for validation as well
-        if validation_data is not None:
-            validation_steps = 1
-
-            x_val, y_val = validation_data
-
         # calculate number of stpes
         if batch_size is not None:
             train_steps = len(x) // batch_size
 
             # check rounding for //
             if train_steps * batch_size < len(x):
-                train_steps +=1
-            if validation_data is not None:
-
-                validation_steps = len(x_val) // batch_size
-
-                if validation_steps * batch_size < len(x_val):
-                    validation_steps +=1
-
+                train_steps += 1
         # main training loop
         for epoch in range(1, epochs + 1):
             print(f'epoch: {epoch}')
@@ -83,12 +69,11 @@ class Model:
                     batch_x = x
                     batch_y = y
                 else:
-                    batch_x = x[step*batch_size:(step+1)*batch_size]
-                    batch_y = y[step*batch_size:(step+1)*batch_size]
+                    batch_x = x[step * batch_size:(step + 1) * batch_size]
+                    batch_y = y[step * batch_size:(step + 1) * batch_size]
 
                 # perform the forward pass
                 output = self.forward(batch_x, training=True)
-
 
                 # calculate loss
                 data_loss, regularization_loss = self.loss.calculate(output, batch_y, include_regularization=True)
@@ -108,7 +93,7 @@ class Model:
 
                 self.optimizer.post_update_params()
 
-                if not step % print_every or step == train_steps -1:
+                if not step % print_every or step == train_steps - 1:
                     print(
                         f'step: {step}, ' +
                         f'acc: {accuracy:.3f}, ' +
@@ -121,45 +106,60 @@ class Model:
             epoch_loss = epoch_data_loss + epoch_regularization_loss
             epoch_accuracy = self.accuracy.calculate_accumulated()
 
-            print(f'training, '+
+            print(f'training, ' +
                   f'acc: {epoch_accuracy:.3f}, ' +
                   f'loss: {epoch_loss:.3f} (' +
-                  f'data_loss: {epoch_data_loss:.3f}, '+
-                  f'reg_loss: {epoch_regularization_loss:.3f}) '+
+                  f'data_loss: {epoch_data_loss:.3f}, ' +
+                  f'reg_loss: {epoch_regularization_loss:.3f}) ' +
                   f'lr: {self.optimizer.current_learning_rate}')
             if validation_data is not None:
+                # evaluate the model
+                # * - starred expression, unpacks the validation_data into singular values.
+                self.evaluate(*validation_data, batch_size=batch_size)
 
-                # reset accumulated values in loss and accuracy
-                self.loss.new_pass()
-                self.accuracy.new_pass()
+    # evaluate the model
+    def evaluate(self, x_val, y_val, *, batch_size=None):
+        # validation steps
+        validation_steps = 1
+        # calculate number of stpes
+        if batch_size is not None:
+            validation_steps = len(x_val) // batch_size
 
-                for step in range(validation_steps):
+            if validation_steps * batch_size < len(x_val):
+                validation_steps += 1
 
-                    if batch_size is None:
-                        batch_x = x
-                        batch_y = y
-                    else:
-                        batch_x = x[step * batch_size:(step + 1) * batch_size]
-                        batch_y = y[step * batch_size:(step + 1) * batch_size]
+        # reset accumulated values in loss and accuracy
+        self.loss.new_pass()
+        self.accuracy.new_pass()
 
-                    # perform forward pass
-                    output = self.forward(batch_x,training=False)
+        for step in range(validation_steps):
 
-                    # calculate loss
-                    loss = self.loss.calculate(output, batch_y)
+            if batch_size is None:
+                batch_x = x_val
+                batch_y = y_val
+            else:
+                batch_x = x_val[step * batch_size:(step + 1) * batch_size]
+                batch_y = y_val[step * batch_size:(step + 1) * batch_size]
 
-                    # get predictions anc calculate accuracy
-                    predictions = self.output_layer_activation.predictions(output)
-                    accuracy = self.accuracy.calculate(predictions, batch_y)
+            # perform forward pass
+            output = self.forward(batch_x, training=False)
 
-                # get and print validation loss and accuracy
-                validation_loss = self.loss.calculate_accumulated()
-                validation_accuracy = self.accuracy.calculate_accumulated()
-                # print summary
-                print(f'validation, ' +
-                      f'acc: {validation_accuracy:.3f}' +
-                      f'loss: {validation_loss:.3f}'
-                      )
+            # calculate loss
+            loss = self.loss.calculate(output, batch_y)
+
+            # get predictions anc calculate accuracy
+            predictions = self.output_layer_activation.predictions(output)
+            accuracy = self.accuracy.calculate(predictions, batch_y)
+
+        # get and print validation loss and accuracy
+        validation_loss = self.loss.calculate_accumulated()
+        validation_accuracy = self.accuracy.calculate_accumulated()
+        # print summary
+        print(f'validation, ' +
+              f'acc: {validation_accuracy:.3f}' +
+              f'loss: {validation_loss:.3f}'
+              )
+
     # finalize the model
     def finalize(self):
 
@@ -204,12 +204,10 @@ class Model:
         # and loss function containing
         # faster gradient calculation
         if isinstance(self.layers[-1], SoftmaxActivation) and \
-            isinstance(self.loss, CategoricalCrossEntropyLoss):
-            
+                isinstance(self.loss, CategoricalCrossEntropyLoss):
             # create an object of combined activation
             # and loss function
             self.softmax_classsifier_output = ActivationSoftmaxLossCategoricalCrossEntropy()
-            
 
     # forwrd pass
     def forward(self, x, training):
@@ -259,3 +257,16 @@ class Model:
         # in reversed order passing dinputs as a parameter
         for layer in reversed(self.layers):
             layer.backward(layer.next.dinputs)
+
+    # retrieves and returns parameters of trainable layers
+    def get_parameters(self):
+
+        # create a list for parameters
+        parameters = []
+
+        # iterable trainable layers and get their parameters
+        for layer in self.trainable_layers:
+            parameters.append(layer.get_parameters())
+
+        # return a list
+        return parameters

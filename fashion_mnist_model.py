@@ -58,22 +58,25 @@ x_test = (x_test.reshape(x_test.shape[0], -1).astype(np.float32) - 127.5) / 127.
 model = Model()
 
 # add layers
-model.add(DenseLayer(x.shape[1], 64))
+model.add(DenseLayer(x.shape[1], 128))
 model.add(ReluActivation())
-model.add(DenseLayer(64, 64))
+model.add(DenseLayer(128, 128))
 model.add(ReluActivation())
-model.add(DenseLayer(64, 10))
+model.add(DenseLayer(128, 10))
 model.add(SoftmaxActivation())
 
 # set loss, optimizer and accuracy objects
 
 model.set(
     loss = CategoricalCrossEntropyLoss(),
-    optimizer=AdamOptimizer(decay=5e-5),
+    optimizer=AdamOptimizer(decay=1e-3),
     accuracy=CategoricalAccuracy()
 )
 
 # finalize the model
 model.finalize()
 # train the model
-model.train(x, y, validation_data=(x_test, y_test), epochs=5, batch_size=128, print_every=100)
+model.train(x, y, validation_data=(x_test, y_test), epochs=10, batch_size=128, print_every=100)
+
+# evaluate the model
+model.evaluate(x_test, y_test)

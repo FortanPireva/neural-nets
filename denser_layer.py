@@ -50,3 +50,7 @@ class DenseLayer:
 
         # gradient on values
         self.dinputs = np.dot(dvalues, self.weights.T)
+
+    # retrieve layer parameters
+    def get_parameters(self):
+        return self.weights, self.biases
