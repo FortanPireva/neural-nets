@@ -3,7 +3,7 @@ from activations.activation_softmax_loss_categorical_crossentropy import Activat
 from input_layer import InputLayer
 from loss import CategoricalCrossEntropyLoss
 from softmax import SoftmaxActivation
-
+import pickle
 
 class Model:
 
@@ -270,3 +270,11 @@ class Model:
 
         # return a list
         return parameters
+
+    # saves the parameters to a file
+    def save_parameters(self, path):
+
+        # open a file in the binary-write mode
+        # and save parameters to it
+        with open(path, 'wb') as f:
+            pickle.dump(self.get_parameters(), f)
