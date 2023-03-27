@@ -6,17 +6,31 @@ class Accuracy:
 
     # calculates an accuracy
     # given predictions and ground truth values
+    def __init__(self):
+        self.accumulated_count = None
+        self.accumulated_sum = None
+
     def calculate(self, predictions, y):
         # get comparison results
         comparisons = self.compare(predictions, y)  # implemented in the subclasses
 
         # calculate an accuracy
         accuracy = np.mean(comparisons)
-
+        
+        # add accumulkated sum of matching values and sample count
+        self.accumulated_sum += np.sum(comparisons)
+        self.accumulated_count += len(comparisons)
         # return accuracy
         return accuracy
 
+    # calculate accumulated accuracy
+    def calculate_accumulated(self):
 
+        return self.accumulated_sum / self.accumulated_count
+
+    def new_pass(self):
+        self.accumulated_sum = 0
+        self.accumulated_count = 0
 class RegressionAccuracy(Accuracy):
 
     def __init__(self):
