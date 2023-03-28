@@ -76,7 +76,12 @@ model.set(
 # finalize the model
 model.finalize()
 # train the model
-model.train(x, y, validation_data=(x_test, y_test), epochs=10, batch_size=128, print_every=100)
+# model.train(x, y, validation_data=(x_test, y_test), epochs=10, batch_size=128, print_every=100)
 
+# load the parameters
+model.load_parameters('fashion_mnist.params')
 # evaluate the model
 model.evaluate(x_test, y_test)
+
+# save parameters
+# model.save_parameters('fashion_mnist.params')

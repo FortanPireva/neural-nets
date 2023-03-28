@@ -54,3 +54,8 @@ class DenseLayer:
     # retrieve layer parameters
     def get_parameters(self):
         return self.weights, self.biases
+
+    # set weights and biases in a layer instance
+    def set_parameters(self, weights, biases):
+        self.weights = weights
+        self.biases  = biases

@@ -5,6 +5,7 @@ from loss import CategoricalCrossEntropyLoss
 from softmax import SoftmaxActivation
 import pickle
 
+
 class Model:
 
     def __init__(self):
@@ -33,10 +34,13 @@ class Model:
         self.layers.append(layer)
 
     # use of * notes that the subsequent parameters are keyword arguments
-    def set(self, *, loss, optimizer, accuracy):
-        self.loss = loss
-        self.optimizer = optimizer
-        self.accuracy = accuracy
+    def set(self, *, loss=None, optimizer=None, accuracy=None):
+        if loss is not None:
+            self.loss = loss
+        if optimizer is not None:
+            self.optimizer = optimizer
+        if accuracy is not None:
+            self.accuracy = accuracy
 
     # train the model
     def train(self, x, y, *, epochs=1, print_every=1,
@@ -196,7 +200,8 @@ class Model:
                 self.trainable_layers.append(self.layers[i])
 
         # update loss with trainable layers
-        self.loss.remember_trainable_layers(self.trainable_layers)
+        if self.loss is not None:
+            self.loss.remember_trainable_layers(self.trainable_layers)
 
         # if output activation is softmax and
         # loss function is categorical cross-entropy
@@ -271,6 +276,15 @@ class Model:
         # return a list
         return parameters
 
+        # set weights and biases in a layer instance
+
+    def set_parameters(self, parameters):
+
+        # iterate over parameters and layers
+        # and update each layers with each set of parameters
+        for parameter_set, layer in zip(parameters, self.trainable_layers):
+            layer.set_parameters(*parameter_set)  # unpack the tuple like list
+
     # saves the parameters to a file
     def save_parameters(self, path):
 
@@ -278,3 +292,12 @@ class Model:
         # and save parameters to it
         with open(path, 'wb') as f:
             pickle.dump(self.get_parameters(), f)
+
+    # loads the weights and updates a model instance with them
+    def load_parameters(self, path):
+
+        # open file in the binary-read mode,
+        # load weights and update trainable layers
+        with open(path, 'rb') as f:
+            self.set_parameters(pickle.load(f))
+
