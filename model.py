@@ -1,4 +1,6 @@
 # model class
+import copy
+
 from activations.activation_softmax_loss_categorical_crossentropy import ActivationSoftmaxLossCategoricalCrossEntropy
 from input_layer import InputLayer
 from loss import CategoricalCrossEntropyLoss
@@ -300,4 +302,28 @@ class Model:
         # load weights and update trainable layers
         with open(path, 'rb') as f:
             self.set_parameters(pickle.load(f))
+
+    # saves the model
+    def save(self, path):
+
+        # make a deep copy of current model instance
+        model = copy.deepcopy(self)
+
+        # reset accumulated values in loss and accuracy objects
+        model.loss.new_pass()
+        model.accuracy.new_pass()
+
+        # remove data from input layer
+        # and gradients from loss object
+        model.input_layer.__dict__.pop('output', None) # if key not found return None as default
+        model.loss.__dict__.pop('dinputs', None)
+
+        # for each layer remove inputs, output and dinputs properties
+        for layer in model.layers:
+            for property in ['inputs', 'output', 'dinputs', 'dweights', 'dbiases']:
+                layer.__dict__.pop(property, None)
+
+        # open a file in the binary-write mode and save the model
+        with open(path, 'wb') as f:
+            pickle.dump(model, f)
 
