@@ -306,6 +306,7 @@ class Model:
     # saves the model
     def save(self, path):
 
+        print('saving model...')
         # make a deep copy of current model instance
         model = copy.deepcopy(self)
 
@@ -315,7 +316,7 @@ class Model:
 
         # remove data from input layer
         # and gradients from loss object
-        model.input_layer.__dict__.pop('output', None) # if key not found return None as default
+        model.input_layer.__dict__.pop('output', None)  # if key not found return None as default
         model.loss.__dict__.pop('dinputs', None)
 
         # for each layer remove inputs, output and dinputs properties
@@ -324,6 +325,16 @@ class Model:
                 layer.__dict__.pop(property, None)
 
         # open a file in the binary-write mode and save the model
+        print(' in ' + path)
         with open(path, 'wb') as f:
             pickle.dump(model, f)
 
+    # static methods that loads and returns the model
+    @staticmethod
+    def load(path):
+
+        # open file in binary-read mode, load a model
+        with open(path, 'rb') as f:
+            model = pickle.load(f)
+
+        return model
