@@ -22,5 +22,7 @@ x_test = (x_test.reshape(x_test.shape[0], -1).astype(np.float32) - 127.5) / 127.
 # load the model
 model = Model.load('fashion_mnist.model')
 
-# evaluate the model
-model.evaluate(x_test, y_test)
+# predict on the first 5 samples from validation dataset
+# and print the result
+confidences = model.predict(x_test[:5])
+print(confidences)

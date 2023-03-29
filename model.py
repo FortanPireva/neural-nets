@@ -1,6 +1,8 @@
 # model class
 import copy
 
+import numpy as np
+
 from activations.activation_softmax_loss_categorical_crossentropy import ActivationSoftmaxLossCategoricalCrossEntropy
 from input_layer import InputLayer
 from loss import CategoricalCrossEntropyLoss
@@ -338,3 +340,39 @@ class Model:
             model = pickle.load(f)
 
         return model
+
+    # predicts on the samples
+    def predict(self, x, *, batch_size=None):
+
+        # default value if batch_size is not being set
+        prediction_steps = 1
+
+        # calculate number of steps
+        if batch_size is not None:
+            prediction_steps = len(x) // batch_size
+
+            if prediction_steps * batch_size < len(x):
+                prediction_steps += 1
+
+        # model outputs
+        output = []
+
+        # iterate over steps
+        for step in range(prediction_steps):
+
+            # if batch_size is not set
+            # train using one step and full dataset
+            if batch_size is None:
+                batch_x = x
+
+            # otherwise slice a batch
+            else:
+                batch_x = x[step*batch_size: (step+1)*batch_size]
+
+            # perform the forward pass
+            batch_output = self.forward(batch_x, training=False)
+
+            # append batch prediction to the list of predictions
+            output.append(batch_output)
+        # stack and return results
+        return np.stack(output)
